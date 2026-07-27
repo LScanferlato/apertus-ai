@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apertus 1.5 &mdash; Traduzione AI On-Premise</title>
+<style>
+  :root {
+    --red: #DA291C;
+    --red-dark: #B01000;
+    --white: #FFFFFF;
+    --gray-50: #F8F9FA;
+    --gray-100: #F0F1F3;
+    --gray-200: #DEE1E6;
+    --gray-400: #9BA1AC;
+    --gray-600: #5A6170;
+    --gray-800: #2D323E;
+    --gray-900: #1A1D24;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    color: var(--gray-800);
+    background: var(--gray-50);
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .hero {
+    background: linear-gradient(135deg, var(--gray-900) 0%, #2D1B1A 100%);
+    color: var(--white);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red), #E85D50, var(--red));
+  }
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span { color: var(--red); }
+  .hero .subtitle {
+    font-size: 1.2rem;
+    color: var(--gray-400);
+    margin-top: 0.75rem;
+    font-weight: 400;
+  }
+  .hero .badges {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 0.35rem 1rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    color: var(--gray-400);
+  }
+  .badge svg { vertical-align: middle; margin-right: 0.35rem; }
+
+  /* Nav */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0.5rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+  .nav a {
+    text-decoration: none;
+    color: var(--gray-600);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .nav a:hover { color: var(--red); background: var(--gray-100); }
+
+  /* Sections */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.5rem;
+  }
+  .section-subtitle {
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+  .section + .section { border-top: 1px solid var(--gray-200); }
+
+  /* Grid cards */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .card-icon {
+    width: 40px; height: 40px;
+    background: var(--red);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .card h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--gray-900); }
+  .card p { font-size: 0.9rem; color: var(--gray-600); line-height: 1.5; }
+
+  /* Spec table */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .spec-item {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .spec-item .label { font-size: 0.8rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em; }
+  .spec-item .value { font-size: 1rem; font-weight: 600; color: var(--gray-900); }
+
+  /* Code blocks */
+  pre {
+    background: var(--gray-900);
+    color: #E4E7EB;
+    padding: 1.25rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: 1rem 0;
+  }
+  code { font-family: var(--mono); }
+  pre .comment { color: #5A6170; }
+  pre .keyword { color: #F97583; }
+  pre .string { color: #B392F0; }
+  pre .literal { color: #79B8FF; }
+
+  /* Param table */
+  .param-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+  }
+  .param-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    font-weight: 600;
+    border-bottom: 2px solid var(--gray-200);
+  }
+  .param-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    color: var(--gray-800);
+  }
+  .param-table tr:last-child td { border: none; }
+  .param-table .mono { font-family: var(--mono); font-size: 0.8rem; background: var(--gray-100); padding: 0.15rem 0.4rem; border-radius: 4px; }
+
+  /* Architecture diagram */
+  .arch {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+  }
+  .arch .box {
+    display: inline-block;
+    background: var(--gray-900);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    margin: 0.5rem;
+  }
+  .arch .box.gpu { background: #1a1a2e; border: 2px solid var(--red); }
+  .arch .box.api { background: var(--red-dark); }
+  .arch .box.nginx { background: #2D5230; }
+  .arch .arrow { color: var(--gray-400); margin: 0.5rem 0; }
+  .arch .label { color: var(--gray-600); font-size: 0.7rem; margin-top: 0.25rem; }
+
+  /* Architecture flow */
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .arch-flow .node {
+    background: var(--gray-900);
+    color: var(--white);
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  .arch-flow .node.gpu { background: #1a1a2e; border: 2px solid var(--red); }
+  .arch-flow .node.api { background: var(--red-dark); }
+  .arch-flow .node.nginx { background: #2D5230; }
+  .arch-flow .connector { color: var(--gray-400); font-size: 1.2rem; }
+
+  /* Response */
+  .response-box {
+    background: #FDF6EC;
+    border: 1px solid #F5D79E;
+    border-radius: 10px;
+    padding: 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+
+  .lang-toggle {
+    text-align: right;
+    margin-bottom: 1rem;
+  }
+  .lang-toggle button {
+    background: none;
+    border: 1px solid var(--gray-200);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+    transition: all 0.15s;
+  }
+  .lang-toggle button:hover { border-color: var(--red); color: var(--red); }
+  .lang-toggle button.active { background: var(--red); color: white; border-color: var(--red); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    color: var(--gray-400);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--gray-200);
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.8rem; }
+    .hero { padding: 2.5rem 1rem 2rem; }
+    .section { padding: 2rem 1rem; }
+    .nav { padding: 0.5rem 0.25rem; gap: 0; }
+    .nav a { font-size: 0.75rem; padding: 0.4rem 0.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+  <h1>Apertus <span>1.5</span></h1>
+  <p class="subtitle">Traduzione AI professionale &mdash; interamente on-premise</p>
+  <div class="badges">
+    <span class="badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      ETH Zurigo / EPFL / CSCS
+    </span>
+    <span class="badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Artificialy / Canton Ticino
+    </span>
+    <span class="badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Apache 2.0
+    </span>
+    <span class="badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      vLLM + FastAPI
+    </span>
+  </div>
+</header>
+
+<!-- Nav -->
+<nav class="nav">
+  <a href="#caratteristiche">Caratteristiche</a>
+  <a href="#architettura">Architettura</a>
+  <a href="#specifiche">Specifiche</a>
+  <a href="#ottimizzazioni">Ottimizzazioni</a>
+  <a href="#api">API</a>
+  <a href="#avvio">Avvio</a>
+</nav>
+
+<!-- Caratteristiche -->
+<section class="section" id="caratteristiche">
+  <h2 class="section-title">Caratteristiche</h2>
+  <p class="section-subtitle">Un sistema di traduzione neurale completo, pensato per la Pubblica Amministrazione</p>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3>Fully On-Premise</h3>
+      <p>Hardware e modello sotto il pieno controllo dell'ente. I dati sensibili non escono mai dal perimetro aziendale.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <h3>Multilingua</h3>
+      <p>Supporto nativo per oltre 1000 lingue. Ottimizzato per italiano, tedesco, francese, romancio, inglese e altre.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <h3>API DeepL-style + OpenAI</h3>
+      <p>Endpoint /translate semplificato e compatibilit&agrave; OpenAI per integrazione con strumenti esistenti.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h.01"/><path d="M15 9h.01"/><path d="M9 15h6"/></svg>
+      </div>
+      <h3>Modello Apertus 1.5 8B</h3>
+      <p>LLM open-source svizzero con architettura multimodale (testo, immagine, audio). Quantizzazione FP8 per efficienza.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>
+      </div>
+      <h3>2x NVIDIA Quadro P4000</h3>
+      <p>Configurazione ottimizzata per GPU Pascal con tensor parallelism, CUDA eager mode e gestione efficiente della VRAM.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      </div>
+      <h3>Docker Container</h3>
+      <p>Stack containerizzato con vLLM + FastAPI + Nginx. Healthcheck end-to-end, riavvio automatico, TLS opzionale.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Architettura -->
+<section class="section" id="architettura">
+  <h2 class="section-title">Architettura del Sistema</h2>
+  <p class="section-subtitle">Stack containerizzato su 2 GPU NVIDIA Quadro P4000</p>
+  <div class="arch">
+    <div class="arch-flow">
+      <div class="node nginx">Nginx<br><span style="font-size:0.7rem;color:#A0A0A0;">TLS termination</span></div>
+      <div class="connector">&rarr;</div>
+      <div class="node api">FastAPI API<br><span style="font-size:0.7rem;color:#FFA098;">/translate &bull; /v1/*</span></div>
+      <div class="connector">&rarr;</div>
+      <div class="node gpu">vLLM GPU 0<br><span style="font-size:0.7rem;color:#A0A0A0;">Quadro P4000 &bull; 8 GB</span></div>
+      <div class="connector">&harr;</div>
+      <div class="node gpu">vLLM GPU 1<br><span style="font-size:0.7rem;color:#A0A0A0;">Quadro P4000 &bull; 8 GB</span></div>
+    </div>
+    <div class="arch-flow" style="margin-top:0.5rem;">
+      <span style="color:var(--gray-400);font-size:0.75rem;">Tensor Parallelism &mdash; TP=2</span>
+      <span style="color:var(--gray-400);font-size:0.75rem;">&bull;</span>
+      <span style="color:var(--gray-400);font-size:0.75rem;">FP8 Dynamic Quantization</span>
+      <span style="color:var(--gray-400);font-size:0.75rem;">&bull;</span>
+      <span style="color:var(--gray-400);font-size:0.75rem;">16 GB VRAM aggregati</span>
+    </div>
+  </div>
+</section>
+
+<!-- Specifiche hardware -->
+<section class="section" id="specifiche">
+  <h2 class="section-title">Specifiche Hardware</h2>
+  <p class="section-subtitle">Configurazione validata per la Pubblica Amministrazione</p>
+  <div class="spec-grid">
+    <div class="spec-item">
+      <div>
+        <div class="label">GPU</div>
+        <div class="value">2 &times; NVIDIA Quadro P4000</div>
+      </div>
+    </div>
+    <div class="spec-item">
+      <div>
+        <div class="label">VRAM per GPU</div>
+        <div class="value">8 GB GDDR5</div>
+      </div>
+    </div>
+    <div class="spec-item">
+      <div>
+        <div class="label">VRAM Totale</div>
+        <div class="value">16 GB</div>
+      </div>
+    </div>
+    <div class="spec-item">
+      <div>
+        <div class="label">Architettura</div>
+        <div class="value">Pascal (Compute 6.1)</div>
+      </div>
+    </div>
+    <div class="spec-item">
+      <div>
+        <div class="label">RAM Sistema</div>
+        <div class="value">&ge; 32 GB</div>
+      </div>
+    </div>
+    <div class="spec-item">
+      <div>
+        <div class="label">Storage</div>
+        <div class="value">&ge; 20 GB liberi</div>
+      </div>
+    </div>
+    <div class="spec-item">
+      <div>
+        <div class="label">Docker</div>
+        <div class="value">&ge; 24 + nvidia-container-toolkit</div>
+      </div>
+    </div>
+    <div class="spec-item">
+      <div>
+        <div class="label">Modello</div>
+        <div class="value">Apertus 1.5 8B FP8</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ottimizzazioni vLLM -->
+<section class="section" id="ottimizzazioni">
+  <h2 class="section-title">Ottimizzazioni per 2 &times; Quadro P4000</h2>
+  <p class="section-subtitle">Parametri vLLM calibrati per GPU Pascal con VRAM limitata</p>
+  <table class="param-table">
+    <thead>
+      <tr>
+        <th>Parametro</th>
+        <th>Valore</th>
+        <th>Motivazione</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="mono">tensor-parallel-size</span></td>
+        <td><strong>2</strong></td>
+        <td>Divide il modello FP8 (~9 GB) su entrambe le GPU (~4.5 GB cad.)</td>
+      </tr>
+      <tr>
+        <td><span class="mono">enforce-eager</span></td>
+        <td><strong>attivo</strong></td>
+        <td>Pascal non supporta CUDA graphs in modo stabile; previene crash</td>
+      </tr>
+      <tr>
+        <td><span class="mono">gpu-memory-utilization</span></td>
+        <td><strong>0.92</strong></td>
+        <td>Utilizza ~7.4 GB degli 8 GB disponibili per GPU</td>
+      </tr>
+      <tr>
+        <td><span class="mono">max-model-len</span></td>
+        <td><strong>16384</strong></td>
+        <td>Contesto sufficiente per traduzione; risparmia ~1 GB VRAM per GPU</td>
+      </tr>
+      <tr>
+        <td><span class="mono">max-num-seqs</span></td>
+        <td><strong>128</strong></td>
+        <td>Throughput bilanciato senza rischio OOM su 8 GB</td>
+      </tr>
+      <tr>
+        <td><span class="mono">kv-cache-dtype</span></td>
+        <td><strong>fp8</strong></td>
+        <td>KV cache in FP8 allineata al modello; dimezza la memoria per cache</td>
+      </tr>
+      <tr>
+        <td><span class="mono">block-size</span></td>
+        <td><strong>16</strong></td>
+        <td>Blocchi piccoli riducono la frammentazione della VRAM</td>
+      </tr>
+      <tr>
+        <td><span class="mono">num-scheduler-steps</span></td>
+        <td><strong>8</strong></td>
+        <td>Pipeline scheduling per migliorare il throughput</td>
+      </tr>
+      <tr>
+        <td><span class="mono">count</span> (deploy)</td>
+        <td><strong>2</strong></td>
+        <td>Docker riserva esplicitamente entrambe le GPU</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- API -->
+<section class="section" id="api">
+  <h2 class="section-title">API</h2>
+  <p class="section-subtitle">Endpoint DeepL-style e compatibilit&agrave; OpenAI</p>
+
+  <h3 style="font-size:1rem;margin-bottom:0.5rem;">POST /translate &mdash; Traduzione singola</h3>
+  <pre><span class="comment"># Richiesta</span>
+curl -X POST http://localhost:8080/translate \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "text": "The Canton of Ticino is the southernmost canton of Switzerland.",
+    "source_lang": "English",
+    "target_lang": "Italian",
+    "context": "public administration"
+  }'</span></pre>
+
+  <pre><span class="comment"># Risposta</span>
+{
+  <span class="literal">"translations"</span>: [
+    { <span class="literal">"text"</span>: <span class="string">"Il Canton Ticino è il cantone più meridionale della Svizzera."</span>,
+      <span class="literal">"target_lang"</span>: <span class="string">"Italian"</span> }
+  ],
+  <span class="literal">"detected_source_lang"</span>: <span class="string">"English"</span>,
+  <span class="literal">"model"</span>: <span class="string">"apertus-translator"</span>,
+  <span class="literal">"usage"</span>: { <span class="literal">"prompt_tokens"</span>: 87, <span class="literal">"completion_tokens"</span>: 18, <span class="literal">"total_tokens"</span>: 105 },
+  <span class="literal">"timings"</span>: { <span class="literal">"total"</span>: 0.42 }
+}</pre>
+
+  <h3 style="font-size:1rem;margin:1.5rem 0 0.5rem;">POST /translate/batch &mdash; Traduzione multipla</h3>
+  <pre>curl -X POST http://localhost:8080/translate/batch \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"texts":["Hello","Goodbye"],"target_lang":"Italian"}'</span></pre>
+
+  <h3 style="font-size:1rem;margin:1.5rem 0 0.5rem;">API OpenAI-compatible</h3>
+  <pre>curl http://localhost:8080/v1/chat/completions \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "model": "apertus-translator",
+    "messages": [
+      {"role": "system", "content": "You are a professional translator."},
+      {"role": "user", "content": "Translate to Italian: Good morning"}
+    ]
+  }'</span></pre>
+
+  <h3 style="font-size:1rem;margin:1.5rem 0 0.5rem;">GET /health &mdash; Stato del servizio</h3>
+  <pre>curl http://localhost:8080/health
+<span class="comment"># {"status":"ok","vllm":"up","model":"artificialy/Apertus-v1.5-8B-FP8-DYNAMIC"}</span></pre>
+</section>
+
+<!-- Avvio -->
+<section class="section" id="avvio">
+  <h2 class="section-title">Avvio Rapido</h2>
+  <p class="section-subtitle">Deploy completo in due comandi</p>
+
+  <pre><span class="comment"># 1. (opzionale) Token HuggingFace per modelli gated</span>
+<span class="keyword">export</span> <span class="literal">HF_TOKEN</span>=hf_xxx
+
+<span class="comment"># 2. Avvia lo stack</span>
+docker compose up -d
+
+<span class="comment"># 3. Monitora il download dei pesi (~9 GB)</span>
+docker compose logs -f vllm
+
+<span class="comment"># 4. Verifica lo stato</span>
+curl http://localhost:8080/health</pre>
+
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>Apertus 1.5 Translation Container &mdash; Basato su tecnologia ETH Zurigo / EPFL / CSCS</p>
+  <p style="margin-top:0.25rem;">Modello: <strong>artificialy/Apertus-v1.5-8B-FP8-DYNAMIC</strong> &bull; Licenza: Apache 2.0</p>
+</footer>
+
+</body>
+</html>
