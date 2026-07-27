@@ -30,9 +30,25 @@ installato dall'azienda ticinese **Artificialy** per il Canton Ticino
 
 ## Requisiti
 
-- Docker >= 24 + plugin `nvidia-container-toolkit`
+- Container runtime: Docker >= 24 **oppure** Podman >= 5 + `podman-compose >= 1.5`
+- `nvidia-container-toolkit` configurato per il proprio runtime
 - GPU NVIDIA con **>= 16 GB VRAM** (FP8), oppure >= 24 GB per BF16
 - (opzionale) `HF_TOKEN` se necessario per il download dei pesi
+
+## Setup NVIDIA Container Toolkit
+
+### Docker
+```bash
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+```
+
+### Podman
+```bash
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+# oppure via script
+sudo bash setup-podman-gpu.sh
+```
 
 ## Avvio rapido
 
@@ -40,11 +56,12 @@ installato dall'azienda ticinese **Artificialy** per il Canton Ticino
 # 1) (opzionale) token HuggingFace, se serve accedere ai pesi gated
 export HF_TOKEN=hf_xxx
 
-# 2) Avvia lo stack
-docker compose up -d
+# 2) Avvia lo stack (scegliere uno)
+docker compose up -d          # Docker
+podman-compose up -d          # Podman
 
 # 3) Verifica lo stato (il primo avvio scarica ~9 GB di pesi)
-docker compose logs -f vllm
+podman-compose logs -f vllm
 curl http://localhost:8080/health
 ```
 

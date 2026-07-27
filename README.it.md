@@ -12,7 +12,8 @@ installato dall'azienda ticinese **Artificialy** per il Canton Ticino.
 | **VRAM totale** | 16 GB |
 | **RAM** | >= 32 GB |
 | **Storage** | >= 20 GB liberi (modello ~9 GB) |
-| **Docker** | >= 24 + nvidia-container-toolkit |
+| **Container runtime** | Docker >= 24 **o** Podman >= 5 + podman-compose >= 1.5 |
+| **nvidia-container-toolkit** | Installato e configurato per il runtime prescelto |
 
 Ottimizzato per GPU Pascal (compute 6.1) con tensor parallelism su 2 GPU.
 
@@ -55,7 +56,8 @@ docker compose up -d
 # oppure: podman-compose up -d
 
 # Monitora il download dei pesi (~9 GB) e l'avvio
-docker compose logs -f vllm
+docker compose logs -f vllm        # Docker
+podman-compose logs -f vllm        # Podman
 
 # Verifica lo stato
 curl http://localhost:8080/health

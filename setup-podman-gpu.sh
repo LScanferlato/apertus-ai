@@ -10,18 +10,14 @@ zypper --non-interactive addrepo --refresh \
 echo "=== Installazione nvidia-container-toolkit ==="
 zypper --non-interactive install nvidia-container-toolkit
 
-echo "=== Configurazione crun per Podman ==="
-nvidia-ctk runtime configure --runtime=crun
-
-echo "=== Generazione configurazione CDI ==="
+echo "=== Generazione configurazione CDI per Podman ==="
 nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
 
 echo "=== Verifica CDI ==="
 nvidia-ctk cdi list
 
 echo ""
-echo "=== Fatto! Riavviare Podman con: ==="
-echo "    sudo systemctl restart podman"
+echo "=== Fatto! (nessun riavvio necessario - Podman legge CDI al volo)"
 echo ""
 echo "=== Poi avviare lo stack con: ==="
 echo "    podman-compose up -d"
