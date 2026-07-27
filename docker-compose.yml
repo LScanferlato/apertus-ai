@@ -1,0 +1,104 @@
+# Apertus 1.5 8B - Translation container stack
+#
+# Based on the CSCS article about the Canton of Ticino's in-house AI
+# translation system, built by Artificialy on top of Apertus 8B.
+#
+# Stack:
+#   - vllm     : official Swiss-AI vLLM Apertus 1.5 image (GPU, OpenAI API)
+#   - api       : FastAPI gateway exposing DeepL-style /translate endpoint
+#   - nginx     : reverse proxy / TLS termination (optional)
+#
+# Usage:
+#   docker compose up -d
+#   curl http://localhost:8080/health
+#   curl -X POST http://localhost:8080/translate \
+#        -H "Content-Type: application/json" \
+#        -d '{"text":"Hello world","target_lang":"Italian"}'
+#
+# Hardware:
+#   Validated on 2x NVIDIA Quadro P4000 (8 GB VRAM each = 16 GB total).
+#   TP=2 splits the 8B FP8 model (~9 GB) across the two GPUs.
+#   For single-GPU setups set TENSOR_PARALLEL_SIZE=1 and reduce --max-model-len.
+#
+# NOTE: Apertus 1.5 is multimodal and the official Swiss-AI vLLM image is
+# the only currently supported inference backend. Ollama has no Apertus
+# GGUF and does not support the multimodal architecture natively, hence
+# we use vLLM here.
+
+services:
+  vllm:
+    # Official Swiss-AI vLLM image with Apertus 1.5 patches pre-installed.
+    image: ghcr.io/swiss-ai/vllm_apertus_1.5_release:latest-amd64
+    container_name: apertus-vllm
+    runtime: nvidia
+    environment:
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
+      # Avoid unexpected online calls if model is already cached locally.
+      - HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-0}
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    ports:
+      - "8000:8000"
+    ipc: host
+    shm_size: 32g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/health',timeout=10)"]
+      interval: 30s
+      timeout: 15s
+      retries: 20
+      start_period: 600s
+    command: >
+      serve artificialy/Apertus-v1.5-8B-FP8-DYNAMIC
+      --host 0.0.0.0
+      --port 8000
+      --served-model-name apertus-translator
+      --served-model-name apertus-translator-thinking
+      --chat-template-content-format string
+      --tensor-parallel-size 2
+      --gpu-memory-utilization 0.90
+      --max-model-len 32768
+      --reasoning-parser apertus
+      --default-chat-template-kwargs.enable_thinking true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    container_name: apertus-api
+    depends_on:
+      vllm:
+        condition: service_healthy
+    environment:
+      - VLLM_BASE_URL=http://vllm:8000
+      - MODEL_NAME=apertus-translator
+      - THINKING_MODEL_NAME=
+      - DEFAULT_TARGET_LANG=Italian
+      - LOG_LEVEL=INFO
+      - MAX_TEXT_CHARS=50000
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: apertus-nginx
+    profiles: ["tls"]
+    depends_on:
+      - api
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
