@@ -16,14 +16,43 @@ installato dall'azienda ticinese **Artificialy** per il Canton Ticino.
 
 Ottimizzato per GPU Pascal (compute 6.1) con tensor parallelism su 2 GPU.
 
+## Prerequisiti (una tantum)
+
+Prima del primo avvio, installare e configurare NVIDIA Container Toolkit per il
+proprio runtime container:
+
+### Docker
+```bash
+# Vedere https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+```
+
+### Podman (openSUSE)
+```bash
+# Script automatico (da eseguire con sudo)
+sudo bash setup-podman-gpu.sh
+```
+
+Oppure manualmente:
+```bash
+sudo zypper addrepo --refresh \
+  https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
+sudo zypper install nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=crun
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+sudo systemctl restart podman
+```
+
 ## Avvio rapido
 
 ```bash
 # (opzionale) token HuggingFace per pesi gated
 export HF_TOKEN=hf_xxx
 
-# Avvia lo stack
+# Avvia lo stack (docker o podman)
 docker compose up -d
+# oppure: podman-compose up -d
 
 # Monitora il download dei pesi (~9 GB) e l'avvio
 docker compose logs -f vllm
@@ -32,7 +61,7 @@ docker compose logs -f vllm
 curl http://localhost:8080/health
 ```
 
-Il primo avvio scarica i pesi del modello; puo richiedere alcuni minuti.
+Il primo avvio scarica i pesi del modello (~9 GB); puo richiedere alcuni minuti.
 
 ## Endpoint
 

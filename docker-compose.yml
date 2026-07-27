@@ -9,7 +9,8 @@
 #   - nginx     : reverse proxy / TLS termination (optional)
 #
 # Usage:
-#   docker compose up -d
+#   docker compose up -d         (Docker)
+#   podman-compose up -d         (Podman)
 #   curl http://localhost:8080/health
 #   curl -X POST http://localhost:8080/translate \
 #        -H "Content-Type: application/json" \
@@ -30,10 +31,13 @@ services:
     # Official Swiss-AI vLLM image with Apertus 1.5 patches pre-installed.
     image: ghcr.io/swiss-ai/vllm_apertus_1.5_release:latest-amd64
     container_name: apertus-vllm
-    runtime: nvidia
+    group_add:
+      - "44"  # video group per accesso GPU
     environment:
       - HF_TOKEN=${HF_TOKEN:-}
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       # Avoid unexpected online calls if model is already cached locally.
       - HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-0}
     volumes:
@@ -65,13 +69,6 @@ services:
       --num-scheduler-steps 8
       --reasoning-parser apertus
       --default-chat-template-kwargs.enable_thinking true
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 2
-              capabilities: [gpu]
     restart: unless-stopped
 
   api:
