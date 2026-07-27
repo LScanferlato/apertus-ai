@@ -31,13 +31,13 @@ services:
     # Official Swiss-AI vLLM image with Apertus 1.5 patches pre-installed.
     image: ghcr.io/swiss-ai/vllm_apertus_1.5_release:latest-amd64
     container_name: apertus-vllm
-    group_add:
-      - "44"  # video group per accesso GPU
+    devices:
+      - nvidia.com/gpu=all
     environment:
       - HF_TOKEN=${HF_TOKEN:-}
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
       - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_DRIVER_CAPABILITIES=all
       # Avoid unexpected online calls if model is already cached locally.
       - HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-0}
     volumes:
@@ -53,7 +53,7 @@ services:
       retries: 20
       start_period: 600s
     command: >
-      serve artificialy/Apertus-v1.5-8B-FP8-DYNAMIC
+      vllm serve artificialy/Apertus-v1.5-8B-FP8-DYNAMIC
       --host 0.0.0.0
       --port 8000
       --served-model-name apertus-translator
@@ -66,7 +66,6 @@ services:
       --max-num-seqs 128
       --kv-cache-dtype fp8
       --block-size 16
-      --num-scheduler-steps 8
       --reasoning-parser apertus
       --default-chat-template-kwargs.enable_thinking true
     restart: unless-stopped

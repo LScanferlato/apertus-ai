@@ -37,17 +37,36 @@ installato dall'azienda ticinese **Artificialy** per il Canton Ticino
 
 ## Setup NVIDIA Container Toolkit
 
-### Docker
+### Ubuntu (automatico)
 ```bash
-sudo nvidia-ctk runtime configure --runtime=docker
-sudo systemctl restart docker
+sudo bash setup-nvidia-container-toolkit.sh
 ```
 
-### Podman
+### Ubuntu (manuale)
 ```bash
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+  sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt update && sudo apt install -y nvidia-container-toolkit
+# Docker:
+sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker
+# Podman:
 sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
-# oppure via script
-sudo bash setup-podman-gpu.sh
+```
+
+### openSUSE (automatico)
+```bash
+sudo bash setup-nvidia-container-toolkit.sh
+```
+
+### openSUSE (manuale)
+```bash
+sudo zypper addrepo --refresh \
+  https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
+sudo zypper install nvidia-container-toolkit
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
 ```
 
 ## Avvio rapido
@@ -119,6 +138,17 @@ curl -X POST http://localhost:8080/translate/batch \
 Apertus è multilingue fin dall'inizio (> 1000 lingue). Per il caso d'uso svizzero
 il prompt di sistema è ottimizzato per: italiano, tedesco, francese, romancio,
 più inglese, spagnolo, rumeno, ucraino (come menzionato nell'articolo CSCS).
+
+## Configurations
+
+- **`docker-compose.yml`** — production config for 2x Quadro P4000 (16 GB VRAM). TP=2, context 16384.
+- **`docker-compose.dev.yml`** — dev override for single-GPU testing (e.g. Quadro P2000 4 GB). TP=1, context 2048.
+  ```bash
+  sudo podman-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+  ```
+
+> **Note**: Apertus 1.5 8B FP8 requires ~9 GB VRAM. It cannot run on 4 GB GPUs.
+> The dev.yml is for infrastructure testing only.
 
 ## Struttura
 

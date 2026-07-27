@@ -22,27 +22,33 @@ Ottimizzato per GPU Pascal (compute 6.1) con tensor parallelism su 2 GPU.
 Prima del primo avvio, installare e configurare NVIDIA Container Toolkit per il
 proprio runtime container:
 
-### Docker
+### Ubuntu (automatico)
 ```bash
-# Vedere https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
-sudo nvidia-ctk runtime configure --runtime=docker
-sudo systemctl restart docker
+sudo bash setup-nvidia-container-toolkit.sh
 ```
 
-### Podman (openSUSE)
+### Ubuntu (manuale)
 ```bash
-# Script automatico (da eseguire con sudo)
-sudo bash setup-podman-gpu.sh
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+  sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt update && sudo apt install -y nvidia-container-toolkit
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
 ```
 
-Oppure manualmente:
+### openSUSE (automatico)
+```bash
+sudo bash setup-nvidia-container-toolkit.sh
+```
+
+### openSUSE (manuale)
 ```bash
 sudo zypper addrepo --refresh \
   https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
 sudo zypper install nvidia-container-toolkit
-sudo nvidia-ctk runtime configure --runtime=crun
 sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
-sudo systemctl restart podman
 ```
 
 ## Avvio rapido
@@ -127,6 +133,19 @@ Il file `docker-compose.yml` include ottimizzazioni specifiche per GPU Pascal:
 | `DEFAULT_TARGET_LANG` | Italian | Lingua target di default |
 | `MAX_TEXT_CHARS` | 50000 | Dimensione massima testo per richiesta |
 | `HF_TOKEN` | - | Token HuggingFace per modelli gated |
+
+## Configurazioni
+
+Il progetto include due file compose:
+
+- **`docker-compose.yml`** — configurazione di produzione per 2x Quadro P4000 (16 GB VRAM). TP=2, contesto 16384.
+- **`docker-compose.dev.yml`** — override per sviluppo su singola GPU (es. Quadro P2000 4 GB). TP=1, contesto 2048.
+  ```bash
+  sudo podman-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+  ```
+
+> **Nota**: il modello Apertus 1.5 8B FP8 richiede ~9 GB di VRAM. Non puo funzionare
+> su GPU con soli 4 GB. Il file dev.yml serve solo per test di infrastruttura.
 
 ## Struttura del progetto
 

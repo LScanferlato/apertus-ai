@@ -576,6 +576,10 @@ curl -X POST http://localhost:8080/translate \
   <h3 style="font-size:1rem;margin:1.5rem 0 0.5rem;">GET /health &mdash; Stato del servizio</h3>
   <pre>curl http://localhost:8080/health
 <span class="comment"># {"status":"ok","vllm":"up","model":"artificialy/Apertus-v1.5-8B-FP8-DYNAMIC"}</span></pre>
+
+  <h3 style="font-size:1rem;margin:1.5rem 0 0.5rem;">GET / &mdash; Info servizio</h3>
+  <pre>curl http://localhost:8080/
+<span class="comment"># {"service":"apertus-translator","model":"artificialy/Apertus-v1.5-8B-FP8-DYNAMIC","endpoints":"/translate, /translate/batch, /v1/*, /health"}</span></pre>
 </section>
 
 <!-- Avvio -->
@@ -583,11 +587,30 @@ curl -X POST http://localhost:8080/translate \
   <h2 class="section-title">Avvio Rapido</h2>
   <p class="section-subtitle">Deploy completo in due comandi</p>
 
+  <h3 style="font-size:1rem;margin-bottom:0.5rem;">Prerequisito: NVIDIA Container Toolkit</h3>
+  <pre><span class="comment"># Ubuntu / Debian</span>
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+  sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+  sed <span class="string">'s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g'</span> | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt update && sudo apt install -y nvidia-container-toolkit
+
+<span class="comment"># openSUSE</span>
+sudo zypper addrepo --refresh \
+  https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
+sudo zypper install nvidia-container-toolkit
+
+<span class="comment"># Configurazione CDI (Podman) o runtime (Docker)</span>
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml  <span class="comment"># Podman</span>
+sudo nvidia-ctk runtime configure --runtime=docker          <span class="comment"># Docker</span></pre>
+
   <pre><span class="comment"># 1. (opzionale) Token HuggingFace per modelli gated</span>
 <span class="keyword">export</span> <span class="literal">HF_TOKEN</span>=hf_xxx
 
-<span class="comment"># 2. Avvia lo stack</span>
+<span class="comment"># 2. Avvia lo stack (Docker o Podman)</span>
 docker compose up -d
+<span class="comment"># oppure: podman-compose up -d</span>
 
 <span class="comment"># 3. Monitora il download dei pesi (~9 GB)</span>
 docker compose logs -f vllm

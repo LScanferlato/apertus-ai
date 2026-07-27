@@ -1,0 +1,19 @@
+# Override per sviluppo su singola GPU (Quadro P2000, 4 GB VRAM)
+# Questo modello NON gira su GPU con 4 GB (richiede 16 GB).
+# Usare solo per test di infrastruttura, non per inferenza reale.
+
+services:
+  vllm:
+    command: >
+      vllm serve artificialy/Apertus-v1.5-8B-FP8-DYNAMIC
+      --host 0.0.0.0
+      --port 8000
+      --served-model-name apertus-translator
+      --chat-template-content-format string
+      --tensor-parallel-size 1
+      --enforce-eager
+      --gpu-memory-utilization 0.90
+      --max-model-len 2048
+      --max-num-seqs 16
+      --kv-cache-dtype fp8
+      --block-size 16
